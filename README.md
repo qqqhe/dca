@@ -27,16 +27,12 @@ There are two sets of numerical experiments conducted in the paper.
 		- Function.java : This is an abstract class for the function oracles	
 		- RAP.java : This a class for discrete simple resource allocation (DRAP) with separable convex objectives. Hochbaum's algorithm (1994) is implemented to solve DRAP with general convex objectives. In addition, for linear objectives, a more efficient O(n) time algorithm is also implemented.	
 		- RAPNC.java : This is a class for RAPNC with separable convex objectives. It provides two methods to solve the problem (DCA and MDA).	
-		- RAP_Continuous.java : This is a class for simple resource allocation with separable convex quadratic objectives. A bisection method is implemented to solve the RAP subproblems in the two algorithms to speed up the performance.	
-		- RAPNC_Continuous.java : This is class for resource allocation problem with lower and upper nested constraints (RAPNC). DCA and MDA for RAP-NC is implemented to solve an RAP-NC instance.
+		
 
  	* ResultType files:
 	  	- ResultTypeRAP.java : This is a class for storing the solution to an instance of DRAP
 		- ResultTypeMDA.java : This is a class for storing the solution to the subproblems of DRAP-NC in the MDA method
 		- ResultTypeRAPNC.java : This is a class for storing the solution to an instance of DRAP-NC
-		- ResultTypeRAP_Continuous.java : This is a class for storing the solution to an instance of continuous RAP 
-		- ResultTypeMDA_Continuous.java : This is a class for storing the solution to the subproblems of RAP-NC in the MDA method
-		- ResultTypeRAPNC_Continuous.java : This is a class for storing the solution to an instance of continuous RAP-NC
 
 
 2. Numerical experiments on solving DRAP-NC with linear and quadratic objectives with DCA and Gurobi:	In the first numerical experiment, we compare the performance of DCA and Gurobi on DRAP-NC instances with linear objectives. When the objectives are linear, Gurobi can solve the problems as linear programs due to the total unimodularity of the constraint matrix in each instance.
