@@ -11,20 +11,19 @@
 * This is a class for RAPNC with separable convex objectives
 * It provides three methods to solve the problem      
 * Method: 
-*     1. solveInteger()-----DCA: (divide and conquer algorithm) 
-*     This algorithm is inspired by He et al. 2017 paper Speed optimization over a path with heterogeneous arc costs.
-*     The algorithm solve a RAP relaxation of RAP-NC and selects the maximum violation of the nested constraints
-*     Then the problem can be divide into two subproblems in the form of RAP-NC and are solved recursively.
+*     1. solveInteger()-----DCA: (the infeasibility-guided divide-and-conquer algorithm) 
+*     This algorithm is inspired by the paper "Speed optimization over a path with heterogeneous arc costs" (He et al. 2017, TRR-part B).
+*     The algorithm solves a DRAP relaxation of DRAP-NC and fixes the nested constraint with maximum violation tight.
+*     Then the problem can be divided into two subproblems in the form of DRAP-NC and are solved recursively.
 *     Running time: Theta(n^2 log B)
 *     Benefit: easy implementation and no Lipschitz continuity is required
 *     solveIntegerLinear() ---- With the O(n) subroutine for solving DRAP, the algorithm can be sped up to Theta(n^2)
 *     @param RAP class must be compiled
 *
-*     2. FastMDA(int u, int v)------MDA: (monotonic decomposition algorithm)
-*     This algorithm is proposed by Vidal et al's 2018 paper on IJOC: 
-*     Separable Convex Optimization with Nested Lower and Upper Constraints
-*     The original implementation is MDA(int u, int v) The main issue is that it requires an Lipschitz constant
-*     After a discussion on INFROMS 2018, we learn that the Lipschitz constant is not mandatory and the algorithm can be improved by discussing 
+*     2. FastMDA(int u, int v)------MDA: (the monotonic decomposition algorithm)
+*     This algorithm is proposed by the paper "Separable Convex Optimization with Nested Lower and Upper Constraints" (Vidal et al 2018, IJOO).
+*     The original implementation is MDA(int u, int v) The main issue is that it requires an Lipschitz constant.
+*     After a discussion with Thibaut Vidal during the 2018 INFORMS annual meeting, we learned that the Lipschitz constant is not mandatory and the algorithm can be improved by discussing 
 *     the boundary cases. Hence, we improve it to and implement FastMDA() 
 *     Running time: O(n log n log B)
 *     LinearMDA() ---- With the O(n) subroutine for solving DRAP, the algorithm can be sped up to O(n log n)
