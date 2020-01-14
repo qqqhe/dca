@@ -1,6 +1,6 @@
 # DCA: a fast exact algorithm for separable convex resource allocation with nested bound constraints
 
-This repository contains the Java implementation of DCA, an infeasibility-guided divide-and-conquer algorithm for a discrete resource allocation problem with nested bound constraints (DRAP-NC), as well as a set of instances that could be used for testing the performance of DCA. The details of the algorithm and the generation of test instances are described in [the following paper](http://www.optimization-online.org/DB_FILE/2018/11/6902.pdf):
+This repository contains the Java implementation of DCA, an infeasibility-guided divide-and-conquer algorithm for a discrete resource allocation problem with nested bound constraints (DRAP-NC), as well as the code of generating random DRAP-NC instances used for testing the performance of DCA. The details of the algorithm and the generation of test instances are described in [the following paper](http://www.optimization-online.org/DB_FILE/2018/11/6902.pdf):
 
 	"A new combinatorial algorithm for separable convex resource allocation with nested bound constraints", Zeyang Wu, Kameng Nip, Qie He, working paper, University of Minnesota, 2019.
 
