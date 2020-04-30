@@ -11,7 +11,7 @@ There are two sets of numerical experiments conducted in the paper.
 	- Test file: TestGurobiDCA_Lin.java, TestGurobiDCA_Qua.java, TestSparseGurobiDCA_Lin, TestSparseGurobiDCA_Qua
 	- Test instances: DRAP-NC with linear and quadratic objectives;
 	- Benchmark: Gurobi
-	- Requirements: Gurobi is installed 
+	- Requirements: Gurobi is installed
 
 2. Solve DRAP-NC with three benchmark convex objectives, in comparison with the Monotonic Decomposition Algorithm (MDA), the algorithm with the current best time complexity.
 	- Test file: TestFlow1Con
@@ -19,15 +19,15 @@ There are two sets of numerical experiments conducted in the paper.
 	- Benchmark: MDA (Please refer to [this paper](https://pubsonline.informs.org/doi/abs/10.1287/ijoo.2018.0004) for the implementation details of MDA)
 	- Requirements: None
 
-## A short description of all the files 
+## A short description of all the files
 
 
 1. Main source files:
-	* Algorithms: 
-		- Function.java : This is an abstract class for the function oracles	
-		- RAP.java : This a class for discrete simple resource allocation (DRAP) with separable convex objectives. Hochbaum's algorithm (1994) is implemented to solve DRAP with general convex objectives. In addition, for linear objectives, a more efficient O(n) time algorithm is also implemented.	
-		- RAPNC.java : This is a class for RAPNC with separable convex objectives. It provides two methods to solve the problem (DCA and MDA).	
-		
+	* Algorithms:
+		- Function.java : This is an abstract class for the function oracles
+		- RAP.java : This a class for discrete simple resource allocation (DRAP) with separable convex objectives. Hochbaum's algorithm (1994) is implemented to solve DRAP with general convex objectives. In addition, for linear objectives, a more efficient O(n) time algorithm is also implemented.
+		- RAPNC.java : This is a class for RAPNC with separable convex objectives. It provides two methods to solve the problem (DCA and MDA).
+
 
  	* ResultType files:
 	  	- ResultTypeRAP.java : This is a class for storing the solution to an instance of DRAP
@@ -45,8 +45,12 @@ There are two sets of numerical experiments conducted in the paper.
 
 3. Numerical experiments on solving DRAP-NC with three benchmark convex objectives with DCA and MDA.
 
-	- TestFlow1Con: This is a test class to evaluate the numerical performance of DCA and MDA on DRAP-NC with three benchmark objectives. You can test arbitrary convex objectives by changing the function oracles. 
+	- TestFlow1Con: This is a test class to evaluate the numerical performance of DCA and MDA on DRAP-NC with three benchmark objectives. You can test arbitrary convex objectives by changing the function oracles.
 
 
+## AMPL test instances
+In the ampl_instances, we provide test instances for the three convex functions in our paper: [F], [CRASH], [FUEL] for readers who are interested in verifying that the integer convex optimization problem are beyond the capability of current commercial mixed-integer convex optimization solver.
 
-
+For each of the objectives, there is one .mod file and multiple .dat file.
+Model files: rapnc_obj_{obj_name}.mod
+Data files: rapnc_ampl_{obj_name}_n={instance_size}.dat. In the first line of the data files, we provide the optimal value (solved by DCA).

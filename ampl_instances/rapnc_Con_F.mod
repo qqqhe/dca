@@ -1,0 +1,15 @@
+param N; # number of resources
+
+param capacity{1..N}; # d_i maximum capacity of each resource
+param nested_lowerbound{1..N}; # lower bounds of the nested constraints where nested_lowerbound[N] = B
+param nested_upperbound{1..N}; # upper bounds of the nested constraints where nested_upperbound[N] = B
+
+param cost_a{1..N}; # cost coefficient
+param cost_b{1..N}; # cost coefficient
+
+var x {i in 1..N} integer >= 0, <= capacity[i]; # decision variables 
+
+minimize Total_Cost:  sum {i in 1..N} (x[i] * x[i] * x[i] * x[i] / 4 + cost_a[i] * x[i]); # F function
+
+subject to nested_contraints {i in 1..N}: 
+	nested_lowerbound[i] <= sum {j in 1..i} x[j] <= nested_upperbound[i];

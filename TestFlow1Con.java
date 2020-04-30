@@ -125,7 +125,7 @@ public class TestFlow1Con {
       		double a = Math.random();
       		double b = Math.random();
       		if (Math.random() < 0.5) {
-      			b = b;
+      			b = -b;
       		}
       		ObjectiveFunction fi = new ObjectiveFunction(a, b);
 			obj.add(fi);
