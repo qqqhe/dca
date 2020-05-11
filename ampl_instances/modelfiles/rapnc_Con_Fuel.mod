@@ -9,7 +9,7 @@ param cost_b{1..N}; # cost coefficient
 
 var x {i in 1..N} integer >= 0, <= capacity[i]; # decision variables 
 
-minimize Total_Cost:  sum {i in 1..N} (cost_b[i] * cost_b[i] * cost_a[i] / (x[i] + 1) / (x[i] + 1) / (x[i] + 1)); # FUEL function 
+minimize Total_Cost:  sum {i in 1..N} (cost_b[i] * cost_b[i] * cost_a[i] / (x[i] + 0.01) / (x[i] + 0.01) / (x[i] + 0.01)); # FUEL function 
 
 subject to nested_contraints {i in 1..N}: 
 	nested_lowerbound[i] <= sum {j in 1..i} x[j] <= nested_upperbound[i];

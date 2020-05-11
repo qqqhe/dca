@@ -71,7 +71,7 @@ public class TestGurobiDCA_Lin {
 		long[] ubVar = instance_data.capacity;
 		long[] lbNested = instance_data.lbNested;
 		long[] ubNested = instance_data.ubNested;
-		double[] cost_a = instance_data.cost_param_a;
+		// double[] cost_a = instance_data.cost_param_a; This parameter is not used in linear function
 		double[] cost_b = instance_data.cost_param_b;
 
 		// Generate Gurobi instances
@@ -104,9 +104,6 @@ public class TestGurobiDCA_Lin {
       		model.setObjective(objGurobi);
 
 
-      		//Nested constraints
-      		double a = 0;
-      		double b = 0;
       		//reset from 0 to dimension - 1
       		for (int i = 0; i < dimension - 1; i++) {
       			GRBLinExpr exprNested = new GRBLinExpr();

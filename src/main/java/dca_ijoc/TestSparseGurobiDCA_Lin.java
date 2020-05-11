@@ -77,7 +77,7 @@ public class TestSparseGurobiDCA_Lin {
 		long[] ubVar = instance_data.capacity;
 		long[] lbNested = instance_data.lbNested;
 		long[] ubNested = instance_data.ubNested;
-		double[] cost_a = instance_data.cost_param_a;
+		// double[] cost_a = instance_data.cost_param_a; This parameter is not used in linear function
         double[] cost_b = instance_data.cost_param_b;
         
 

@@ -9,7 +9,7 @@ param cost_b{1..N}; # cost coefficient
 
 var x {i in 1..N} integer >= 0, <= capacity[i]; # decision variables 
 
-minimize Total_Cost:  sum {i in 1..N} (10 * cost_b[i] + cost_a[i] / (x[i] + 1)); # Crash function 
+minimize Total_Cost:  sum {i in 1..N} (10 * cost_b[i] + cost_a[i] / (x[i] + 0.01)); # Crash function 
 
 subject to nested_contraints {i in 1..N}: 
 	nested_lowerbound[i] <= sum {j in 1..i} x[j] <= nested_upperbound[i];
