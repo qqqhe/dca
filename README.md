@@ -30,4 +30,4 @@ Due to size limit, we only uploaded the intances with up to 409600 variables. In
 
 ## ACKNOWLEDGMENT
 
-We are extremely grateful to Thibaut Vidal for sharing the implementation details of MDA. His comments on an earlier version of our algorithm helped improve the quality of our manuscript greatly.
+We are extremely grateful to Thibaut Vidal for sharing the implementation details of MDA. His comments on an earlier version of our algorithm helped improve the quality of our manuscript greatly. We also thank the anonymous referees for their careful reading of our manuscript and their many insightful comments and suggestions.
