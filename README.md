@@ -1,56 +1,31 @@
-# DCA: a fast exact algorithm for separable convex resource allocation with nested bound constraints
+# DCA: a fast exact algorithm for 
 
 This repository contains the Java implementation of DCA, an infeasibility-guided divide-and-conquer algorithm for a discrete resource allocation problem with nested bound constraints (DRAP-NC), as well as the code of generating random DRAP-NC instances used for testing the performance of DCA. The details of the algorithm and the generation of test instances are described in [the following paper](http://www.optimization-online.org/DB_FILE/2018/11/6902.pdf):
 
 	"A new combinatorial algorithm for separable convex resource allocation with nested bound constraints", Zeyang Wu, Kameng Nip, Qie He, working paper, University of Minnesota, 2019.
+	
+## Introduction
+This repo contains all source files of the numerical experiment conducted in the paper. It contains 
+1. Implementation of DCA and MDA (in java). All the source files are in folder `./src/main/java/dca_ijoc`. The main file is RAPNC that implements the two algorithms used to solve DRAP-NC: DCA and MDA. 
+2. Code to reporduce the experiment. The main class is `TestConDCA`. 
+2. Data files of test instances used in the paper in json format. Please see the details in the later section. 
 
-## Running the test
-There are two sets of numerical experiments conducted in the paper.
-
-1. Solve DRAP-NC with linear and quadratic objectives with DCA, in comparison with Gurobi.
-	- Test file: TestGurobiDCA_Lin.java, TestGurobiDCA_Qua.java, TestSparseGurobiDCA_Lin, TestSparseGurobiDCA_Qua
-	- Test instances: DRAP-NC with linear and quadratic objectives;
-	- Benchmark: Gurobi
-	- Requirements: Gurobi is installed
-
-2. Solve DRAP-NC with three benchmark convex objectives, in comparison with the Monotonic Decomposition Algorithm (MDA), the algorithm with the current best time complexity.
-	- Test file: TestFlow1Con
-	- Test instances: DRAP-NC with three classes of benchmark convex objectives, [F], [CRASH], and [FUEL]
-	- Benchmark: MDA (Please refer to [this paper](https://pubsonline.informs.org/doi/abs/10.1287/ijoo.2018.0004) for the implementation details of MDA)
-	- Requirements: None
-
-## A short description of all the files
-
-
-1. Main source files:
-	* Algorithms:
-		- Function.java : This is an abstract class for the function oracles
-		- RAP.java : This a class for discrete simple resource allocation (DRAP) with separable convex objectives. Hochbaum's algorithm (1994) is implemented to solve DRAP with general convex objectives. In addition, for linear objectives, a more efficient O(n) time algorithm is also implemented.
-		- RAPNC.java : This is a class for RAPNC with separable convex objectives. It provides two methods to solve the problem (DCA and MDA).
-
-
- 	* ResultType files:
-	  	- ResultTypeRAP.java : This is a class for storing the solution to an instance of DRAP
-		- ResultTypeMDA.java : This is a class for storing the solution to the subproblems of DRAP-NC in the MDA method
-		- ResultTypeRAPNC.java : This is a class for storing the solution to an instance of DRAP-NC
-
-
-2. Numerical experiments on solving DRAP-NC with linear and quadratic objectives with DCA and Gurobi:	In the first numerical experiment, we compare the performance of DCA and Gurobi on DRAP-NC instances with linear objectives. When the objectives are linear, Gurobi can solve the problems as linear programs due to the total unimodularity of the constraint matrix in each instance.
-
-	- TestGurobiDCA_Lin.java : This is a test class to evaluate the numerical performance of DCA, and Gurobi on DRAP-NC with linear objectives
-	- TestGurobiDCA_Qua.java : This is a test class to evaluate the numerical performance of DCA, and Gurobi on DRAP-NC with quadratic objectives
-	- TestSparseGurobiDCA_Lin.java : This is a test class to evaluate the numerical performance of DCA and Gurobi on DRAP-NC with linear objectives under a sparse formulation. The running time of Gurobi is sped up by more than 30 times.
-	- TestSparseGurobiDCA_Qua.java : This is a test class to evaluate the numerical performance of DCA and Gurobi on DRAP-NC with quadratic objectives under a sparse formulation. The running time of Gurobi is sped up by more than 30 times.
-
-
-3. Numerical experiments on solving DRAP-NC with three benchmark convex objectives with DCA and MDA.
-
-	- TestFlow1Con: This is a test class to evaluate the numerical performance of DCA and MDA on DRAP-NC with three benchmark objectives. You can test arbitrary convex objectives by changing the function oracles.
-
-
-## AMPL test instances
-In the ampl_instances, we provide test instances for the three convex functions in our paper: [F], [CRASH], [FUEL] for readers who are interested in verifying that the integer convex optimization problem are beyond the capability of current commercial mixed-integer convex optimization solver.
-
-For each of the objectives, there is one .mod file and multiple .dat file.
-Model files: rapnc_obj_{obj_name}.mod
-Data files: rapnc_ampl_{obj_name}_n={instance_size}.dat. In the first line of the data files, we provide the optimal value (solved by DCA).
+## To run the numerical experiment
+To run the numerical experiment, simply execute the main methods of the following class. 
+1. `TestConDCA`: Compare the performance of DCA and MDA with three convex objectives: [F], [FUEL] and [CRASH]. 
+2. `TestSparseGurobiDCA_Lin` and `TestSparseGurobiDCA_Qua`: Compare the performance of DCA and Gurobi in solving DRAP-NC with linear/quadratic objectives. 
+	
+## Test instances data files
+In this Repo, we provide the some test instances of RAPNC
+1. Test instances in the paper. In the section Numerical experiments of the paper, we compare the performance of DCA with MDA on three convex objectives on randomly generated instance. We stored the test instances in folder `./test_instances/TIMESTAMP/OBJFUNCTION/..`. The data files are json files. Each file stores a struct with following fields: 
+	- sting objFuncType, the type of objective function, currently we have [F], [FUEL] and [CRASH].
+	- int dimension, the size of the instances
+	- long[] lbVar, the lower bounds of decision variables
+	- long[] ubVar, the upper bounds of decision variables
+	- long[] lbNested, the lower bounds of nested constraint
+	- long[] ubNested, the upper bounds of nested constraint
+	- double[] cost_param_a, 
+	- double[] cost_param_b, two parameters that define the convex objective function
+Due to size limit, we only uploaded the intances with up to 409600 variables. Interested readers can generate new test instances with the static method `genTestCollectionToFiles()` in class `TestConDCA` with appropriate inputs. 
+	
+2. Test instances in the AMPL data files format. These instances are used to evaluate the performance of commercial solver. The files are stored in `./ampl_instances/datafiles/..`. The coresponding .mod files are in `./ampl_instances/modelfiles/..`. In the first line of each .dat file, we provide the optimal value (solved by DCA). We also share the source code `AMPLTestGenerator` used to generate these instances. Interested researchers could modify the objective function and the problem size in the code to generate other test instances of larger sizes. 
