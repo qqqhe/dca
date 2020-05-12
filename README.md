@@ -24,7 +24,7 @@ We provide the test instances of RAPNC used in the paper.
 	- long[] ubNested, the upper bounds of nested constraint
 	- double[] cost_param_a, 
 	- double[] cost_param_b, two parameters that define the convex objective function
-Due to size limit, we only uploaded the intances with up to 409600 variables. Interested readers can generate new test instances with the static method `genTestCollectionToFiles()` in class `TestConDCA` with appropriate inputs. 
+	- Due to size limit, we only uploaded the intances with up to 409600 variables. Interested readers can generate new test instances with the static method `genTestCollectionToFiles()` in class `TestConDCA` with appropriate inputs.
 	
 2. Test instances in the AMPL data files format. These instances are used to evaluate the performance of commercial solver. The files are stored in `./ampl_instances/datafiles/..`. The coresponding .mod files are in `./ampl_instances/modelfiles/..`. In the first line of each .dat file, we provide the optimal value (solved by DCA). We also share the source code `AMPLTestGenerator` used to generate these instances. Interested researchers could modify the objective function and the problem size in the code to generate other test instances of larger sizes. 
 
