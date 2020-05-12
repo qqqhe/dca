@@ -1,23 +1,20 @@
-# DCA: a fast exact algorithm for 
+# DCA: A new combinatorial algorithm for separable convexresource allocation with nested bound constraints
 
-This repository contains the Java implementation of DCA, an infeasibility-guided divide-and-conquer algorithm for a discrete resource allocation problem with nested bound constraints (DRAP-NC), as well as the code of generating random DRAP-NC instances used for testing the performance of DCA. The details of the algorithm and the generation of test instances are described in [the following paper](http://www.optimization-online.org/DB_FILE/2018/11/6902.pdf):
+## Overview 
+This repository contains the Java implementation of DCA, an infeasibility-guided divide-and-conquer algorithm for a discrete resource allocation problem with nested bound constraints (DRAP-NC), as well as the code of generating random DRAP-NC instances used for testing the performance of DCA. DCA is a fast algorithm that can solve DRAP-NC with millions of variable in seconds. The details of the algorithm and the generation of test instances are described in [the following paper](http://www.optimization-online.org/DB_FILE/2018/11/6902.pdf):
 
 	"A new combinatorial algorithm for separable convex resource allocation with nested bound constraints", Zeyang Wu, Kameng Nip, Qie He, working paper, University of Minnesota, 2019.
-	
-## Introduction
-This repo contains all source files of the numerical experiment conducted in the paper. It contains 
-1. Implementation of DCA and MDA (in java). All the source files are in folder `./src/main/java/dca_ijoc`. The main file is RAPNC that implements the two algorithms used to solve DRAP-NC: DCA and MDA. 
-2. Code to reporduce the experiment. The main class is `TestConDCA`. 
-2. Data files of test instances used in the paper in json format. Please see the details in the later section. 
 
 ## To run the numerical experiment
+All the source files are in folder `./src/main/java/dca_ijoc`. The main file is RAPNC.java that implements the two algorithms used to solve DRAP-NC: DCA and a benchmark algorithm MDA. For more details of MDA, see [the paper](https://arxiv.org/abs/1703.01484). 
+
 To run the numerical experiment, simply execute the main methods of the following class. 
 1. `TestConDCA`: Compare the performance of DCA and MDA with three convex objectives: [F], [FUEL] and [CRASH]. 
 2. `TestSparseGurobiDCA_Lin` and `TestSparseGurobiDCA_Qua`: Compare the performance of DCA and Gurobi in solving DRAP-NC with linear/quadratic objectives. 
 	
 ## Test instances data files
-In this Repo, we provide the some test instances of RAPNC
-1. Test instances in the paper. In the section Numerical experiments of the paper, we compare the performance of DCA with MDA on three convex objectives on randomly generated instance. We stored the test instances in folder `./test_instances/TIMESTAMP/OBJFUNCTION/..`. The data files are json files. Each file stores a struct with following fields: 
+We provide the test instances of RAPNC used in the paper. 
+1. Test instances in the numerical experiment section. In the section Numerical experiments of the paper, we compare the performance of DCA with MDA on three convex objectives on randomly generated instance. We stored the test instances in folder `./test_instances/TIMESTAMP/OBJFUNCTION/..`. The data files are json files. Each file stores a struct with following fields: 
 	- sting objFuncType, the type of objective function, currently we have [F], [FUEL] and [CRASH].
 	- int dimension, the size of the instances
 	- long[] lbVar, the lower bounds of decision variables
