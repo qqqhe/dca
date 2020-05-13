@@ -18,18 +18,20 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
 
 public class TestConDCA {
+    final static long ExperimentInPaperSeed = 9999; 
+    final static Random ExperimentInPaperRandomGenerator = new Random(ExperimentInPaperSeed);
     /**
      * genTestCollectionToFiles method This is a method that generates an instance
      * of RAPNC.
      * 
-     * @param objFuncType types of object function, we support ["linear",
+     * @param objFuncTypes types of object function, we support ["linear",
      *                    "quadratic", "f", "fuel", "crash"]
-     * @param size        sizes of the instances
-     * @param varBound    the upperbounds of capacity
+     * @param varBounds    the upperbounds of capacity
+     * @param sizes        sizes of the instances
+     * @param Random generator so that we can control the random instance
      * @return a collection of instance of RAPNC data
      */
-    public static void genTestCollectionToFiles(String[] objFuncTypes, int[] sizes, int[] varBounds, int rep,
-            String folderpath) {
+    public static void genTestCollectionToFiles(String[] objFuncTypes, int[] varBounds, int[] sizes, int rep, String folderpath, Random generator) {
         for (String objFuncType : objFuncTypes) {
             for (int varBound : varBounds) {
                 Map<Integer, ArrayList<String>> testCollectionMap = new HashMap<>();
@@ -40,8 +42,7 @@ public class TestConDCA {
                             + String.format("/Instance%s/VB=%d/n=%d/", objFuncType, varBound, size);
                     new File(filepath).mkdirs();
                     for (int i = 0; i < rep; i++) {
-                        RAPNCTestUtils.RAPNCInstanceData data = RAPNCTestUtils.generateInstanceData(objFuncType, size,
-                                varBound);
+                        RAPNCTestUtils.RAPNCInstanceData data = RAPNCTestUtils.generateInstanceData(objFuncType, size, varBound, generator);
                         String filename = genDataFileName(objFuncType, varBound, size, i);
 
                         // Write data to file
@@ -73,6 +74,11 @@ public class TestConDCA {
                 }
             }
         }
+    }
+
+    public static void genTestCollectionToFiles(String[] objFuncTypes, int[] varBounds, int[] sizes, int rep, String folderpath) {
+        Random generator = new Random();
+        genTestCollectionToFiles(objFuncTypes, varBounds, sizes, rep, folderpath, generator);
     }
 
     /**
@@ -140,13 +146,14 @@ public class TestConDCA {
      * evaluateDCAMDAInMemory method 
      * Evalute the performance of MDA and DCA in Memory without storing test instances. 
      * 
-     * @param objFuncType types of object function, we support ["linear",
+     * @param objFuncType type of object function, we support ["linear",
      *                    "quadratic", "f", "fuel", "crash"]
-     * @param size        sizes of the instances
+     * @param sizes        sizes of the instances
      * @param varBound    the upperbounds of capacity
+     * @param generator   rand generator so that we can control the random instance
      * @return void, will output the test data in test_logs
      */
-    public static void evaluateDCAMDAInMemory(String objFuncType, int varBound, int[] sizes, int rep) {
+    public static void evaluateDCAMDAInMemory(String objFuncType, int varBound, int[] sizes, int rep, Random generator) {
         try {
             PrintStream o = new PrintStream(
                 new File(
@@ -163,7 +170,7 @@ public class TestConDCA {
             System.out.println("Dimension        DCA       FastMDA	      number_subproblem_DCA      number_subproblem_MDA");
             for (int size : sizes) {
                 for (int i = 0; i < rep; i++) {
-                    RAPNCTestUtils.RAPNCInstanceData instance = RAPNCTestUtils.generateInstanceData(objFuncType, size, varBound);
+                    RAPNCTestUtils.RAPNCInstanceData instance = RAPNCTestUtils.generateInstanceData(objFuncType, size, varBound, generator);
                     System.out.println(RAPNCTestUtils.compare_DCA_MDA(instance));
                 }
                 System.out.println();
@@ -173,12 +180,51 @@ public class TestConDCA {
         }
     }
 
-    public static void evaluateCollectionsDCAMDAInMemory(String[] objFuncTypes, int[] sizes, int[] varBounds, int rep) {
+    /**
+     * evaluateDCAMDAInMemory method  
+     * Evalute the performance of MDA and DCA in Memory without storing test instances. 
+     * 
+     * @param objFuncType types of object function, we support ["linear",
+     *                    "quadratic", "f", "fuel", "crash"]
+     * @param size        sizes of the instances
+     * @param varBound    the upperbounds of capacity
+     * @return void, will output the test data in test_logs
+     */
+    public static void evaluateDCAMDAInMemory(String objFuncType, int varBound, int[] sizes, int rep) {
+        Random generator = new Random();
+        evaluateDCAMDAInMemory(objFuncType, varBound, sizes, rep, generator);
+    }
+
+    /**
+     * evaluateCollectionsDCAMDAInMemory method 
+     * Evalute the performance of MDA and DCA in Memory without storing test instances for multiple inputs. 
+     * @param objFuncTypes types of object function, we support ["linear",
+     *                    "quadratic", "f", "fuel", "crash"]
+     * @param sizes        sizes of the instances
+     * @param varBounds    the upperbounds of capacity
+     * @param generator   rand generator so that we can control the random instance
+     * @return void, will output the test data in test_logs
+     */
+    public static void evaluateCollectionsDCAMDAInMemory(String[] objFuncTypes, int[] varBounds, int[] sizes, int rep, Random generator) {
         for (String objFuncType : objFuncTypes) {
             for (int varBound : varBounds) {
-                evaluateDCAMDAInMemory(objFuncType, varBound, sizes, rep);
+                evaluateDCAMDAInMemory(objFuncType, varBound, sizes, rep, generator);
             }
         }
+    }
+
+     /**
+     * evaluateCollectionsDCAMDAInMemory method 
+     * Evalute the performance of MDA and DCA in Memory without storing test instances for multiple inputs. 
+     * @param objFuncTypes types of object function, we support ["linear",
+     *                    "quadratic", "f", "fuel", "crash"]
+     * @param varBounds    the upperbounds of capacity
+     * @param sizes        sizes of the instances
+     * @return void, will output the test data in test_logs
+     */
+    public static void evaluateCollectionsDCAMDAInMemory(String[] objFuncTypes, int[] varBounds, int[] sizes, int rep) {
+        Random generator = new Random();
+        evaluateCollectionsDCAMDAInMemory(objFuncTypes, varBounds, sizes, rep, generator);
     }
 
     /**
@@ -199,7 +245,7 @@ public class TestConDCA {
         int[] varBounds = new int[]{100};
         int rep = 10;
 
-        evaluateCollectionsDCAMDAInMemory(objFuncTypes, sizes, varBounds, rep);
+        evaluateCollectionsDCAMDAInMemory(objFuncTypes, sizes, varBounds, rep, ExperimentInPaperRandomGenerator);
 
         return;
     }
@@ -209,24 +255,26 @@ public class TestConDCA {
          * Please be aware of the json file size. For an instance with 1M variables, the data file in json format is roughly 100Mb. 
          */
         int[] sizes = new int[]{800, 1600, 3200, 6400, 12800, 25600, 51200, 51200<<1, 51200<<2};
+        sizes = new int[]{800, 1600, 3200};
         String[] objFuncTypes = new String[]{"f", "fuel", "crash"};
         int[] varBounds = new int[]{100};
         int rep =10;
         String folderpath = String.format("./test_instances/%d/", System.currentTimeMillis());
+        Random defaultRandomSeed = new Random(1000);
 
         /*
          * Use gen_instance to generate new test instance files
          */ 
-        // String func = "gen_instance";
+        String func = "gen_instance";
         /*
          * Use execute_test to execute the test from the saved data files
         */ 
-        String func = "execute_test";
+        // String func = "execute_test";
         String datafile_timestamp = "1589214682686";
 
         try {
             if (func == "gen_instance") {
-                genTestCollectionToFiles(objFuncTypes, sizes, varBounds, rep, folderpath);
+                genTestCollectionToFiles(objFuncTypes, varBounds, sizes, rep, folderpath, defaultRandomSeed);
             } else if (func == "execute_test") {
                 for (int varBound : varBounds) {
                     for (String objFuncType : objFuncTypes) {

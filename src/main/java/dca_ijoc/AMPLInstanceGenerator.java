@@ -24,7 +24,6 @@ public class AMPLInstanceGenerator {
 
 		//test settings (dimension)
         int[] testSize = new int[]{10, 20, 30, 100, 200, 800, 1600, 3200, 6400, 12800, 25600, 51200, 51200<<1};
-        //testSize = new int[]{10, 20, 30, 100, 200};
         
         for (String objFuncType : objFuncTypes) {
             String filename = "rapnc_ampl_" + objFuncType + "_n=";

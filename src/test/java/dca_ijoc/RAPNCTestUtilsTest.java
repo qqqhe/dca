@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 /**
  * Unit test for simple App.
@@ -47,15 +49,21 @@ class RAPNCTestUtilsTest {
         String[] ObjFuncTypes = new String[]{"linear", "quadratic", "f", "fuel", "crash"};
         for (String ObjFuncType : ObjFuncTypes) {
             for (int i = 0; i < test_sizes.length; i++) {
-                RAPNCTestUtils.RAPNCInstanceData data = RAPNCTestUtils.generateInstanceData(ObjFuncType, test_sizes[i], 100);
-                
-                solveAndCheck(data);
+                RAPNCTestUtils.RAPNCInstanceData data1 = RAPNCTestUtils.generateInstanceData(ObjFuncType, test_sizes[i], 100);
+                RAPNCTestUtils.RAPNCInstanceData data2 = RAPNCTestUtils.generateInstanceData(ObjFuncType, test_sizes[i], 100, null);
+                RAPNCTestUtils.RAPNCInstanceData data3 = RAPNCTestUtils.generateInstanceData(ObjFuncType, test_sizes[i], 100, new Random());
+                solveAndCheck(data1);
+                solveAndCheck(data2);
+                solveAndCheck(data3);
                 
                 System.out.println("Test generateInstanceData() for object: " + ObjFuncType);   
             }
         }
+        solveAndCheck(RAPNCTestUtils.generateInstanceData("fuel", 50, 100, null));
 
         System.out.println(ANSI_GREEN+ "Test generateInstanceData() passed!" + ANSI_RESET);
+
+        
     }
 
     @Test

@@ -242,6 +242,21 @@ public class RAPNCTestUtils {
      * @return an instance of RAPNC data
      */
     public static RAPNCInstanceData generateInstanceData(String objFuncType, int size, int varBound) {
+        Random generator = new Random();
+        return generateInstanceData(objFuncType, size, varBound, generator);
+    }
+    
+    /**
+     * generateTestInstanceData method 
+     * This is a method that generates an instance of RAPNC.
+     * Time-Complexity: O(n) 
+     * @param objFuncType type of object function, we support ["linear", "quadratic", "f", "fuel", "crash"]
+     * @param size size of the instances 
+     * @param varBound the upperbound of capacity 
+     * @param generator rand generator so that we can control the random instance
+     * @return an instance of RAPNC data
+     */
+    public static RAPNCInstanceData generateInstanceData(String objFuncType, int size, int varBound, Random generator) {
         int dimension = size; 
 		long[] lbVar = new long[dimension];
 		long[] ubVar = new long[dimension];
@@ -250,11 +265,14 @@ public class RAPNCTestUtils {
 		double[] cost_param_a = new double[dimension];
 		double[] cost_param_b = new double[dimension];
 
+        if (generator == null) {
+            generator = new Random();
+        }
 
 		// Create box constraints on variables
       	for (int i = 0; i < dimension; i++) {
-			long b = (long) ((Math.random() + 0.3)* varBound);
-			long c = (long) (Math.random() * varBound);
+			long b = (long) ((generator.nextDouble() + 0.3)* varBound);
+			long c = (long) (generator.nextDouble() * varBound);
 			if (b < c) {
 				lbVar[i] = b;
 				ubVar[i] = c;
@@ -268,9 +286,9 @@ public class RAPNCTestUtils {
       		
       	// Set objective      		
       	for (int i = 0; i < dimension; i++) {
-      		double a = Math.random();
-      		double b = Math.random();
-      		if (Math.random() < 0.5) {
+      		double a = generator.nextDouble();
+      		double b = generator.nextDouble();
+      		if (generator.nextDouble() < 0.5) {
       			b = -b;
       		}
             cost_param_a[i] = a;
@@ -283,8 +301,8 @@ public class RAPNCTestUtils {
       	double b = 0;
       	//reset from 1 to dimension
       	for (int i = 0; i < dimension - 1; i++) {
-      		a += lbVar[i] + Math.random() * (ubVar[i] - lbVar[i]);
-      		b += lbVar[i] + Math.random() * (ubVar[i] - lbVar[i]);
+      		a += lbVar[i] + generator.nextDouble() * (ubVar[i] - lbVar[i]);
+      		b += lbVar[i] + generator.nextDouble() * (ubVar[i] - lbVar[i]);
       		if (a > b) {
       			lbNested[i] = (long) b;
       			ubNested[i] = (long) a;
@@ -295,8 +313,8 @@ public class RAPNCTestUtils {
       	}
             
         // Add constraint:\sum x_i = B
-      	a += lbVar[dimension - 1] + Math.random() * (ubVar[dimension - 1] - lbVar[dimension - 1]);
-      	b += lbVar[dimension - 1] + Math.random() * (ubVar[dimension - 1] - lbVar[dimension - 1]);
+      	a += lbVar[dimension - 1] + generator.nextDouble() * (ubVar[dimension - 1] - lbVar[dimension - 1]);
+      	b += lbVar[dimension - 1] + generator.nextDouble() * (ubVar[dimension - 1] - lbVar[dimension - 1]);
       	long B = (long) Math.max(a, b);
       	// Greedy Algorithm
       	lbNested[dimension - 1] = B;
