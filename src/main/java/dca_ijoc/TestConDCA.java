@@ -18,8 +18,9 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
 
 public class TestConDCA {
-    final static long ExperimentInPaperSeed = 9999; 
-    final static Random ExperimentInPaperRandomGenerator = new Random(ExperimentInPaperSeed);
+    final static long ExperimentInPaperSeed_F = 9999; 
+    final static long ExperimentInPaperSeed_FUEL = 8888; 
+    final static long ExperimentInPaperSeed_CRASH = 7777; 
     /**
      * genTestCollectionToFiles method This is a method that generates an instance
      * of RAPNC.
@@ -241,13 +242,20 @@ public class TestConDCA {
      */
     public static void ExperimentInPaper() {
         int[] sizes = new int[]{800, 1600, 3200, 6400, 12800, 25600, 51200, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5, 51200<<6, 51200<<7};
-        String[] objFuncTypes = new String[]{"f", "fuel", "crash"};
+        // String[] objFuncTypes = new String[]{"f", "fuel", "crash"};
+        sizes = new int[]{800, 1600, 3200};
         int[] varBounds = new int[]{100};
         int rep = 10;
 
-        evaluateCollectionsDCAMDAInMemory(objFuncTypes, varBounds, sizes, rep, ExperimentInPaperRandomGenerator);
+        evaluateCollectionsDCAMDAInMemory(new String[]{"f",}, varBounds, sizes, rep, new Random(ExperimentInPaperSeed_F));
+        evaluateCollectionsDCAMDAInMemory(new String[]{"fuel",}, varBounds, sizes, rep, new Random(ExperimentInPaperSeed_FUEL));
+        evaluateCollectionsDCAMDAInMemory(new String[]{"crash",}, varBounds, sizes, rep, new Random(ExperimentInPaperSeed_CRASH));
 
         return;
+    }
+
+    public static void main2(String[] args) {
+        ExperimentInPaper();
     }
 
     public static void main(String[] args) {
@@ -255,26 +263,28 @@ public class TestConDCA {
          * Please be aware of the json file size. For an instance with 1M variables, the data file in json format is roughly 100Mb. 
          */
         int[] sizes = new int[]{800, 1600, 3200, 6400, 12800, 25600, 51200, 51200<<1, 51200<<2};
-        sizes = new int[]{800, 1600, 3200};
         String[] objFuncTypes = new String[]{"f", "fuel", "crash"};
         int[] varBounds = new int[]{100};
         int rep =10;
-        String folderpath = String.format("./test_instances/%d/", System.currentTimeMillis());
-        Random defaultRandomSeed = new Random(1000);
+        String folderpath = String.format("./test_instances/%s/", "1589214682686");
 
         /*
          * Use gen_instance to generate new test instance files
+         * If you are interested in testing new instances, please change the random seed and the folderpath
          */ 
-        String func = "gen_instance";
+        // String func = "gen_instance";
         /*
          * Use execute_test to execute the test from the saved data files
+         * If you are interested in testing new instances, please change the folderpath
         */ 
-        // String func = "execute_test";
+        String func = "execute_test";
         String datafile_timestamp = "1589214682686";
 
         try {
             if (func == "gen_instance") {
-                genTestCollectionToFiles(objFuncTypes, varBounds, sizes, rep, folderpath, defaultRandomSeed);
+                genTestCollectionToFiles(new String[]{"f",}, varBounds, sizes, rep, folderpath,new Random(ExperimentInPaperSeed_F));
+                genTestCollectionToFiles(new String[]{"fuel",}, varBounds, sizes, rep, folderpath, new Random(ExperimentInPaperSeed_FUEL));
+                genTestCollectionToFiles(new String[]{"crash",}, varBounds, sizes, rep, folderpath, new Random(ExperimentInPaperSeed_CRASH));
             } else if (func == "execute_test") {
                 for (int varBound : varBounds) {
                     for (String objFuncType : objFuncTypes) {
