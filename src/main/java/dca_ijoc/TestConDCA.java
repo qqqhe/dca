@@ -245,7 +245,7 @@ public class TestConDCA {
         int[] varBounds = new int[]{100};
         int rep = 10;
 
-        evaluateCollectionsDCAMDAInMemory(objFuncTypes, sizes, varBounds, rep, ExperimentInPaperRandomGenerator);
+        evaluateCollectionsDCAMDAInMemory(objFuncTypes, varBounds, sizes, rep, ExperimentInPaperRandomGenerator);
 
         return;
     }
