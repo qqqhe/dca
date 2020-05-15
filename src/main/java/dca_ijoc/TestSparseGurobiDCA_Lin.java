@@ -158,6 +158,7 @@ public class TestSparseGurobiDCA_Lin {
 			double sum = 0;
       
 			for (int i = 0; i < dimension; i++) {
+				/* The solution might be differernt, but the objective value is the same.
 				double val = varlist[i].get(GRB.DoubleAttr.X);
 				if (Math.abs(val - res.sol[i]) >= 0.01) {
 					System.out.println("No, the solution x[i] is different.");
@@ -165,6 +166,7 @@ public class TestSparseGurobiDCA_Lin {
 					System.out.print(" ");
 					System.out.println(res.sol[i]);
 				}
+				*/
 				sum += test.obj.get(i).getValue(res.sol[i]);
 			}
 
