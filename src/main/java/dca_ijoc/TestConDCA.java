@@ -243,7 +243,6 @@ public class TestConDCA {
     public static void ExperimentInPaper() {
         int[] sizes = new int[]{800, 1600, 3200, 6400, 12800, 25600, 51200, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5, 51200<<6, 51200<<7};
         // String[] objFuncTypes = new String[]{"f", "fuel", "crash"};
-        sizes = new int[]{800, 1600, 3200};
         int[] varBounds = new int[]{100};
         int rep = 10;
 
