@@ -15,9 +15,9 @@
 
 package dca_ijoc;
 
+import java.util.*;
 import java.io.*;
 import gurobi.*;
-import java.text.DecimalFormat;
 
 public class TestSparseGurobiDCA_Lin {
 	/**
@@ -25,38 +25,39 @@ public class TestSparseGurobiDCA_Lin {
      * initial the test and record the test result in a text file
      * You can modify the name, the header of the text file as well as the test cases
      */
-	public static void main(String[] args) throws FileNotFoundException{
-		//Set output environment
-		long currentTime = System.currentTimeMillis();
-		PrintStream o = new PrintStream(new File("DCA----Gurobi" + " Linear sparse formulation" + Long.toString(currentTime) + "   Vb 10" + ".txt"));
-		System.setOut(o);
-
-		
-		//test settings (dimension)
-		//For gurobi, it is recommend to set size less than 10000.
-
-		int[] testSize = new int[]{400, 800, 1600, 3200, 6400, 9600, 12800};
-		//testSize = new int[]{400, 400<<1, 400<<2, 400<<3, 400<<4, 400<<5, 400<<6, 400<<7};
-		//testSize = new int[]{12800, 25600, 51200};
-		//int x = 51200;
-		//testSize = new int[]{25600, 52100, 51200<<1, 51200<<2, 51200<<3, 51200<<4};
-		testSize = new int[]{400, 800, 1600, 3200, 6400, 9600, 12800, 25600, 52100, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5, 51200<<6};
-        testSize = new int[]{51200<<4, 51200<<5, 51200<<6};
-        testSize = new int[]{400, 800, 1600, 3200};
+	public static void main(String[] args) throws FileNotFoundException {
+		int[] sizes = new int[]{3200, 6400, 9600, 12800, 25600, 52100};
+		//sizes = new int[]{3200, 6400, 9600, 12800, 25600, 52100, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5};
 		int rep = 10;
-		int varBound = 10;
+		int[] varBounds = new int[]{10, 100};
 
-		System.out.println("Test: Variable bound " + varBound + ": objectives type: Linear Function + Sparse formulation");
-		System.out.println("Dimension        DCA    Gurobi   Gap      NodeCount(Explored)    RootGap      HGap");
+		testRAPNCDCAGurobiLinear(sizes, varBounds[0], rep, new Random(1000));
+		testRAPNCDCAGurobiLinear(sizes, varBounds[1], rep, new Random(2000));
+	}
 
-		for (int i = 0; i < testSize.length; i++) {
-			for (int j = 0; j < rep; j++) {
-				test(testSize[i], varBound);
+	public static void testRAPNCDCAGurobiLinear(int[] sizes, int varBound, int rep, Random generator) {
+		try {
+			long time_stamp = System.currentTimeMillis();
+			PrintStream o = new PrintStream(
+				new File(
+					"test_logs/DCA---Gurobi numerical experiment_" 
+					+ String.format("Time=%s", time_stamp)
+					+ String.format("_ObjType=%s", "linear")
+					+ String.format("_varBound=%d.txt", varBound)
+				)
+			);
+			System.setOut(o);
+			System.out.println("Dimension		DCA		Gurobi");
+
+			for (int i : sizes) {
+				for (int j = 0; j < rep; j++) {
+					compareDCAGurobiLinear(i, varBound, generator);
+				}
+				System.out.println("");
 			}
-			System.out.println(" ");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		return;
 	}
 
 	/**
@@ -68,10 +69,10 @@ public class TestSparseGurobiDCA_Lin {
      * @param size dimension of the problem
      * @param varBound related to the upper bound of the box constraints: d_i < 1.3 * varBound
      */
-    public static void test (int size, int varBound) {
+    public static void compareDCAGurobiLinear(int size, int varBound, Random generator) {
 
     	//generate a feasible RAPNC instance
-		RAPNCTestUtils.RAPNCInstanceData instance_data = RAPNCTestUtils.generateInstanceData("linear", size, varBound);
+		RAPNCTestUtils.RAPNCInstanceData instance_data = RAPNCTestUtils.generateInstanceData("linear", size, varBound, generator);
 		int dimension = instance_data.dimension;
 		long[] lbVar = instance_data.lbVar;
 		long[] ubVar = instance_data.capacity;
@@ -85,7 +86,7 @@ public class TestSparseGurobiDCA_Lin {
 	   	try {
     		GRBEnv env = new GRBEnv("qp.log");    		
       		GRBModel model = new GRBModel(env);
-      		model.set("OutputFlag", "1");      		
+      		model.set("OutputFlag", "0"); //Disable logging to avoid I/O time
             //model.set(GRB.DoubleParam.FeasibilityTol, 0.000001);
               
             String[] varNames = new String[dimension];
@@ -130,18 +131,23 @@ public class TestSparseGurobiDCA_Lin {
                 model.addConstr(exprNested, GRB.EQUAL, 0, "NESTED" + Integer.toString(i));
             }
 
-      		//solve the problem by DCA algorithm
+      		//solve the problem by DCA 
       		RAPNC test = instance_data.toRAPNC();
       		long startTime = System.currentTimeMillis();
-            ResultTypeRAPNC res = test.solveIntegerLinearDCA();
-			//ResultTypeRAPNC res = test.solveIntegerDCA();
+			ResultTypeRAPNC res = test.solveIntegerLinearDCA();
+
 			if (dimension < 10000) {
-				for (int i = 0; i < 100; i++) {
+				for (int i = 0; i < 9; i++) {
 					res = test.solveIntegerLinearDCA();
 				}
-            }
+			}
 			long endTime = System.currentTimeMillis();
 			long timeDCA = endTime - startTime;
+
+			if (dimension < 10000) {
+				timeDCA = Math.round(((double) timeDCA) / 10);
+            } 
+			
 			
  			// Optimize Gurobi model
  			startTime = System.currentTimeMillis();
@@ -149,10 +155,6 @@ public class TestSparseGurobiDCA_Lin {
 			endTime = System.currentTimeMillis();
 			long timeGurobi = endTime - startTime;
 
-			double MipGap = 0; //model.get(GRB.DoubleAttr.MIPGap);
-			DecimalFormat df = new DecimalFormat("#.#####"); 
-			String MipGapFormatted = df.format(MipGap); 
-			int NodeCount = (int) model.get(GRB.DoubleAttr.NodeCount);
 			double sum = 0;
       
 			for (int i = 0; i < dimension; i++) {
@@ -172,29 +174,13 @@ public class TestSparseGurobiDCA_Lin {
 				System.out.println("No! The obj is not the same. But the values are close. Gurobi is not optimal");
 			}
 
-			// Root Gap 
-			model.reset();
-			model.set("NodeLimit", "0");      
-			//model.optimize();
-			double RootGap = 0; //model.get(GRB.DoubleAttr.MIPGap);
-			DecimalFormat rdf = new DecimalFormat("#.#####"); 
-			String RootGapFormatted = rdf.format(RootGap);
-
-			// Node 1 Gap 
-			model.reset();
-			model.set("NodeLimit", "1");      
-			//model.optimize();
-			double HGap = 0; //model.get(GRB.DoubleAttr.MIPGap);
-			DecimalFormat hdf = new DecimalFormat("#.#####"); 
-			String HGapFormatted = hdf.format(HGap);
-
       		System.out.println(
 				String.format("%10s", dimension) 
 				+ String.format("%10s", ((double) timeDCA) / 1000) 
 				+ String.format("%10s", ((double) timeGurobi) / 1000) 
 			);
-      		// Dispose of model and environment 
-            
+			  
+			// Dispose the model and environment 
       		model.dispose();
       		env.dispose();
 
