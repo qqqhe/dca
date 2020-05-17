@@ -26,8 +26,8 @@ public class TestSparseGurobiDCA_Lin {
      * You can modify the name, the header of the text file as well as the test cases
      */
 	public static void main(String[] args) throws FileNotFoundException {
-		int[] sizes = new int[]{3200, 6400, 9600, 12800, 25600, 52100};
-		//sizes = new int[]{3200, 6400, 9600, 12800, 25600, 52100, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5};
+		int[] sizes = new int[]{3200, 6400, 12800, 25600, 52100};
+		sizes = new int[]{3200, 6400, 12800, 25600, 52100, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5};
 		int rep = 10;
 		int[] varBounds = new int[]{10, 100};
 
