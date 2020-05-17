@@ -23,23 +23,69 @@ public class AMPLInstanceGenerator {
 		int varBound = 100;
 
 		//test settings (dimension)
-        int[] testSize = new int[]{10, 20, 30, 100, 200, 800, 1600, 3200, 6400, 12800, 25600, 51200, 51200<<1};
-        
+		int[] testSizes = new int[]{10, 20, 30, 100, 200, 800, 1600};
+		Random default_generator = new Random(10000);
+		
         for (String objFuncType : objFuncTypes) {
             String filename = "rapnc_ampl_" + objFuncType + "_n=";
-            for (int test_size : testSize) {
+            for (int size : testSizes) {
                 write_data_file(
                     objFuncType,
-                    test_size, 
+                    size, 
                     varBound, 
-                    filename + Long.toString(test_size)+".dat"
+					filename + Long.toString(size) + ".dat",
+					default_generator
                 );
             }
         }
 
+		/*
+		 * The following line will generate the AMPL data file for instances used in the paper with up to 102400 variables.
+		 * Please comment this line if you wanted to generate your own instances of larger sizes.
+		 */
+		// genInstanceInPaper();
+		
 		return;
 	}
-    
+	
+	public static void genInstanceInPaper() {
+		String[] objFuncTypes = new String[]{"Con_F", "Con_FUEL", "Con_CRASH"};
+
+		int varBound = 100;
+
+		//test settings (dimension)
+		int[] sizes = new int[]{3200, 6400, 12800, 25600, 51200, 51200<<1};
+		Map<String, Random> generator_map = new HashMap<>();
+		generator_map.put("Con_F", new Random(TestConDCA.ExperimentInPaperSeed_F));
+		generator_map.put("Con_FUEL", new Random(TestConDCA.ExperimentInPaperSeed_FUEL));
+		generator_map.put("Con_CRASH", new Random(TestConDCA.ExperimentInPaperSeed_CRASH));
+
+		int rep = 10; // We only generate the first instance of the 10 rep isntances
+
+		for (String objFuncType : objFuncTypes) {
+			for (int size : sizes) {
+				for (int i = 0; i < rep; i++) {
+					Random generator = generator_map.get(objFuncType);
+					RAPNCTestUtils.RAPNCInstanceData data = RAPNCTestUtils.generateInstanceData(objFuncType, size, varBound, generator);
+					if (i == 0) {
+						try {
+							String filename = "rapnc_ampl_" + objFuncType + "_n=" + Long.toString(size) + ".dat";
+							File filepath = new File("./ampl_instances/datafiles/" + objFuncType);
+        					filepath.mkdirs();
+							filepath = new File("./ampl_instances/datafiles/" + objFuncType + '/' + filename);
+							PrintStream output = new PrintStream(filepath);
+							System.setOut(output);
+							write_data_file_impl(data);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+		
+		return;
+	}
     /**
 	 * write_data_file method A class to generate AMPL data files Default:
 	 * 
@@ -48,7 +94,7 @@ public class AMPLInstanceGenerator {
 	 * @param varBound related to the upper bound of the box constraints: d_i < 1.3 * varBound     
 	 * @throws FileNotFoundException
 	 */
-	public static void write_data_file(String objFuncType, int size, int varBound, String filename) throws FileNotFoundException {
+	public static void write_data_file(String objFuncType, int size, int varBound, String filename, Random generator) throws FileNotFoundException {
         //Set up output enviroment
         File filepath = new File("./ampl_instances/datafiles/" + objFuncType);
         filepath.mkdirs();
@@ -56,7 +102,17 @@ public class AMPLInstanceGenerator {
         PrintStream output = new PrintStream(filepath);
 		System.setOut(output);
 
-        RAPNCTestUtils.RAPNCInstanceData data = RAPNCTestUtils.generateInstanceData(objFuncType, size, varBound);
+        RAPNCTestUtils.RAPNCInstanceData data = RAPNCTestUtils.generateInstanceData(objFuncType, size, varBound, generator);
+		write_data_file_impl(data);
+	}
+	
+	/**
+	 * write_data_file method A class to generate AMPL data files Default:
+	 * 
+     * @param data an instance of RAPNCTestUtils.RAPNCInstanceData 
+	 */
+	public static void write_data_file_impl(RAPNCTestUtils.RAPNCInstanceData data) {
+		int size = data.dimension;
 		long[] ubVar = data.capacity;
 		long[] lbNested = data.lbNested;
 		long[] ubNested = data.ubNested;
@@ -102,5 +158,5 @@ public class AMPLInstanceGenerator {
 			System.out.println(String.format("%d %f", i + 1, cost_b[i]));
 		}		
 		System.out.println(";");	  
-    }
+	}
 }
