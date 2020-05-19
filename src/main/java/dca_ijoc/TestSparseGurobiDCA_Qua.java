@@ -15,6 +15,7 @@
 package dca_ijoc;
 
 import java.io.*;
+import java.util.*;
 import gurobi.*;
 import java.text.DecimalFormat;
 
@@ -24,31 +25,41 @@ public class TestSparseGurobiDCA_Qua{
      * initial the test and record the test result in a text file
      * You can modify the name, the header of the text file as well as the test cases
      */
-	public static void main(String[] args) throws FileNotFoundException{
-		//Set output environment
-		long currentTime = System.currentTimeMillis();
-		PrintStream o = new PrintStream(new File("DCA----Gurobi" + " Quadratic + Sparse formulation" + Long.toString(currentTime) + "   Vb 10" + ".txt"));
-		System.setOut(o);
-
-		
-		//test settings (dimension)
-		//For gurobi, it is recommended to set size less than 10000.
-		int[] testSize = new int[]{50, 100, 200, 220, 240, 260, 280, 300, 320, 340, 360, 280, 300, 320, 340, 360, 380, 400};
-		testSize = new int[]{50, 100};
+	public static void main(String[] args) {
+		int[] sizes = new int[]{50, 100, 200, 220, 240, 260, 280, 300, 320, 340, 360, 280, 300, 320, 340, 360, 380, 400};
+		sizes = new int[]{10, 20, 50, 100, 120};
 		int rep = 10;
-		int varBound = 10;
+		int[] varBounds = new int[]{100, 100};
 
-		System.out.println("Test: Variable bound " + varBound + ": objectives type: Quadratic Function + Sparse formulation");
-		System.out.println("Dimension        DCA    Gurobi   Gap      NodeCount(Explored)    RootGap      HGap");
-
-		for (int i = 0; i < testSize.length; i++) {
-			for (int j = 0; j < rep; j++) {
-				test(testSize[i], varBound);
-			}
-			System.out.println(" ");
-		}
+		testRAPNCDCAGurobiQua(sizes, varBounds[0], rep, new Random(3000));
+		testRAPNCDCAGurobiQua(sizes, varBounds[1], rep, new Random(4000));
 		
 		return;
+	}
+
+	private static void testRAPNCDCAGurobiQua(int[] sizes, int varBound, int rep, Random generator) {
+		try {
+			long time_stamp = System.currentTimeMillis();
+			PrintStream o = new PrintStream(
+				new File(
+					"test_logs/DCA---Gurobi numerical experiment_" 
+					+ String.format("Time=%s", time_stamp)
+					+ String.format("_ObjType=%s", "quadratic")
+					+ String.format("_varBound=%d.txt", varBound)
+				)
+			);
+			System.setOut(o);
+			System.out.println("Dimension	100*DCA	Gurobi		Gap  NodeCount(Explored)  RootGap  HGap");
+
+			for (int i : sizes) {
+				for (int j = 0; j < rep; j++) {
+					compareDCAGurobiQuadratic(i, varBound, generator);
+				}
+				System.out.println("");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -60,10 +71,10 @@ public class TestSparseGurobiDCA_Qua{
      * @param size dimension of the problem
      * @param varBound related to the upper bound of the box constraints: d_i < 1.3 * varBound
      */
-    public static void test (int size, int varBound) {
+    private static void compareDCAGurobiQuadratic(int size, int varBound, Random generator) {
 
     	//generate a feasible RAPNC instance
-		RAPNCTestUtils.RAPNCInstanceData instance_data = RAPNCTestUtils.generateInstanceData("quadratic", size, varBound);
+		RAPNCTestUtils.RAPNCInstanceData instance_data = RAPNCTestUtils.generateInstanceData("quadratic", size, varBound, generator);
 		int dimension = instance_data.dimension;
 		long[] lbVar = instance_data.lbVar;
 		long[] ubVar = instance_data.capacity;
@@ -129,15 +140,13 @@ public class TestSparseGurobiDCA_Qua{
       		long startTime = System.currentTimeMillis();
 			ResultTypeRAPNC res = test.solveIntegerDCA();
 			if (dimension < 10000) {
-				for (int i = 0; i < 100; i++) {
+				for (int i = 0; i < 99; i++) {
 					res = test.solveIntegerDCA();
 				}
 			}
-			
-			// Solving time 
 			long endTime = System.currentTimeMillis();
 			long timeDCA = endTime - startTime;
-
+			
  			// Optimize Gurobi model
  			startTime = System.currentTimeMillis();
 			model.optimize();
@@ -149,8 +158,12 @@ public class TestSparseGurobiDCA_Qua{
 			String MipGapFormatted = df.format(MipGap); 
 			int NodeCount = (int) model.get(GRB.DoubleAttr.NodeCount);
 			double sum = 0;
-      
+	  
+			/* Sanity check 
+			 *
+			 */
 			for (int i = 0; i < dimension; i++) {
+				/*
 				double val = varlist[i].get(GRB.DoubleAttr.X);
 				if (Math.abs(val - res.sol[i]) >= 0.01) {
 					System.out.println("No, the solution x[i] is different.");
@@ -158,13 +171,14 @@ public class TestSparseGurobiDCA_Qua{
 					System.out.print(" ");
 					System.out.println(res.sol[i]);
 				}
+				*/
 				sum += test.obj.get(i).getValue(res.sol[i]);
 			}
 
-			if (Math.abs(sum - model.get(GRB.DoubleAttr.ObjVal)) > 0.001) {
+			if (Math.abs((sum - model.get(GRB.DoubleAttr.ObjVal))/sum) > 0.001) {
 				System.out.println(sum);
 				System.out.println(model.get(GRB.DoubleAttr.ObjVal));
-				System.out.println("No!!!!!!! The obj is not the same. But the values are close. Gurobi is not optimal");
+				System.out.println("The obj values differ by 0.1%!");
 			}
 
 			// Root Gap 

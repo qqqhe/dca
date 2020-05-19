@@ -21,11 +21,9 @@ import gurobi.*;
 
 public class TestSparseGurobiDCA_Lin {
 	/**
-     * main method
-     * initial the test and record the test result in a text file
-     * You can modify the name, the header of the text file as well as the test cases
+     * main method to trigger the experiment
      */
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) {
 		int[] sizes = new int[]{3200, 6400, 12800, 25600, 52100};
 		sizes = new int[]{3200, 6400, 12800, 25600, 52100, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5};
 		int rep = 10;
@@ -35,7 +33,7 @@ public class TestSparseGurobiDCA_Lin {
 		testRAPNCDCAGurobiLinear(sizes, varBounds[1], rep, new Random(2000));
 	}
 
-	public static void testRAPNCDCAGurobiLinear(int[] sizes, int varBound, int rep, Random generator) {
+	private static void testRAPNCDCAGurobiLinear(int[] sizes, int varBound, int rep, Random generator) {
 		try {
 			long time_stamp = System.currentTimeMillis();
 			PrintStream o = new PrintStream(
@@ -69,7 +67,7 @@ public class TestSparseGurobiDCA_Lin {
      * @param size dimension of the problem
      * @param varBound related to the upper bound of the box constraints: d_i < 1.3 * varBound
      */
-    public static void compareDCAGurobiLinear(int size, int varBound, Random generator) {
+    private static void compareDCAGurobiLinear(int size, int varBound, Random generator) {
 
     	//generate a feasible RAPNC instance
 		RAPNCTestUtils.RAPNCInstanceData instance_data = RAPNCTestUtils.generateInstanceData("linear", size, varBound, generator);
