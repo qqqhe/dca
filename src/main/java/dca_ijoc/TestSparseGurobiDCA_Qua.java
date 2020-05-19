@@ -27,9 +27,9 @@ public class TestSparseGurobiDCA_Qua{
      */
 	public static void main(String[] args) {
 		int[] sizes = new int[]{50, 100, 200, 220, 240, 260, 280, 300, 320, 340, 360, 280, 300, 320, 340, 360, 380, 400};
-		sizes = new int[]{10, 20, 50, 100, 120};
+		// sizes = new int[]{10, 20, 50, 100, 120};
 		int rep = 10;
-		int[] varBounds = new int[]{100, 100};
+		int[] varBounds = new int[]{10, 100};
 
 		testRAPNCDCAGurobiQua(sizes, varBounds[0], rep, new Random(3000));
 		testRAPNCDCAGurobiQua(sizes, varBounds[1], rep, new Random(4000));
