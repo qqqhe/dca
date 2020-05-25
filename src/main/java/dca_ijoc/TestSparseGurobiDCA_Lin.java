@@ -21,11 +21,11 @@ import gurobi.*;
 
 public class TestSparseGurobiDCA_Lin {
 	/**
-     * main method to trigger the experiment
+     * main method which triggers the experiment
      */
 	public static void main(String[] args) {
-		int[] sizes = new int[]{3200, 6400, 12800, 25600, 52100};
-		sizes = new int[]{3200, 6400, 12800, 25600, 52100, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5};
+		int[] sizes = new int[]{3200, 6400, 12800, 25600, 51200};
+		sizes = new int[]{3200, 6400, 12800, 25600, 51200, 51200<<1, 51200<<2, 51200<<3, 51200<<4, 51200<<5, 51200<<6};
 		int rep = 10;
 		int[] varBounds = new int[]{10, 100};
 
@@ -83,9 +83,14 @@ public class TestSparseGurobiDCA_Lin {
 		// Generate Gurobi instances
 	   	try {
     		GRBEnv env = new GRBEnv("qp.log");    		
-      		GRBModel model = new GRBModel(env);
-      		model.set("OutputFlag", "0"); //Disable logging to avoid I/O time
-            //model.set(GRB.DoubleParam.FeasibilityTol, 0.000001);
+			GRBModel model = new GRBModel(env);
+			// Disable logging to avoid I/O time
+			model.set("OutputFlag", "0"); 
+			/**
+			 * Use primal simplex method (0) to solve LP. See https://www.gurobi.com/documentation/9.0/refman/method.html
+			 */
+			model.set("Method", "0"); 
+            // model.set(GRB.DoubleParam.FeasibilityTol, 0.000001);
               
             String[] varNames = new String[dimension];
             String[] varNamesY = new String[dimension];
@@ -151,7 +156,7 @@ public class TestSparseGurobiDCA_Lin {
  			startTime = System.currentTimeMillis();
 			model.optimize();
 			endTime = System.currentTimeMillis();
-			long timeGurobi = endTime - startTime;
+			long timeGurobi = (long) (1000 * model.get(GRB.DoubleAttr.Runtime));
 
 			double sum = 0;
       
@@ -177,7 +182,7 @@ public class TestSparseGurobiDCA_Lin {
       		System.out.println(
 				String.format("%10s", dimension) 
 				+ String.format("%10s", ((double) timeDCA) / 1000) 
-				+ String.format("%10s", ((double) timeGurobi) / 1000) 
+				+ String.format("%10s", ((double) timeGurobi) / 1000)
 			);
 			  
 			// Dispose the model and environment 
