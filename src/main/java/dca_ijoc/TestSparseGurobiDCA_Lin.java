@@ -36,14 +36,12 @@ public class TestSparseGurobiDCA_Lin {
 	private static void testRAPNCDCAGurobiLinear(int[] sizes, int varBound, int rep, Random generator) {
 		try {
 			long time_stamp = System.currentTimeMillis();
-			PrintStream o = new PrintStream(
-				new File(
-					"test_logs/DCA---Gurobi numerical experiment_" 
-					+ String.format("Time=%s", time_stamp)
-					+ String.format("_ObjType=%s", "linear")
-					+ String.format("_varBound=%d.txt", varBound)
-				)
-			);
+			String filepath = "test_logs/DCA---Gurobi numerical experiment_" 
+				+ String.format("Time=%s", time_stamp)
+				+ String.format("_ObjType=%s", "linear")
+				+ String.format("_varBound=%d.txt", varBound);
+			PrintStream o = new PrintStream(new File(filepath));
+
 			System.setOut(o);
 			System.out.println("Dimension		DCA		Gurobi");
 
@@ -84,14 +82,9 @@ public class TestSparseGurobiDCA_Lin {
 	   	try {
     		GRBEnv env = new GRBEnv("qp.log");    		
 			GRBModel model = new GRBModel(env);
-			// Disable logging to avoid I/O time
-			model.set("OutputFlag", "0"); 
-			/**
-			 * Use primal simplex method (0) to solve LP. See https://www.gurobi.com/documentation/9.0/refman/method.html
-			 */
-			model.set("Method", "0"); 
-            // model.set(GRB.DoubleParam.FeasibilityTol, 0.000001);
-              
+			model.set("OutputFlag", "1"); 
+			model.set("Threads", "1");
+
             String[] varNames = new String[dimension];
             String[] varNamesY = new String[dimension];
       		double[] lbVarGurobi = new double[dimension];
@@ -107,8 +100,8 @@ public class TestSparseGurobiDCA_Lin {
 				typeGurobi[i] = GRB.CONTINUOUS;
                 varNames[i] = "x" + Integer.toString(i);
                 
-                lbNestGurobi[i] = (double) lbNested[i];
-      			ubNestGurobi[i] = (double) ubNested[i];
+                lbNestGurobi[i] = 0;
+      			ubNestGurobi[i] = (double) (ubNested[i] - lbNested[i]);
       			varNamesY[i] = "y" + Integer.toString(i);    	
 		    }		
 			
@@ -126,12 +119,15 @@ public class TestSparseGurobiDCA_Lin {
             // Set nested constraint
       		for (int i = 0; i < dimension; i++) {
                 GRBLinExpr exprNested = new GRBLinExpr();
-                exprNested.addTerm(1.0, varlistY[i]);
-                exprNested.addTerm(-1.0, varlist[i]);
+                exprNested.addTerm(-1.0, varlistY[i]);
+				exprNested.addTerm(1.0, varlist[i]);
+
+				double rhs = lbNested[0];
                 if (i > 0) {
-                    exprNested.addTerm(-1.0, varlistY[i-1]);
-                }
-                model.addConstr(exprNested, GRB.EQUAL, 0, "NESTED" + Integer.toString(i));
+					exprNested.addTerm(1.0, varlistY[i-1]);
+					rhs = lbNested[i] - lbNested[i-1];
+				}
+                model.addConstr(exprNested, GRB.EQUAL, rhs, "NESTED" + Integer.toString(i));
             }
 
       		//solve the problem by DCA 
