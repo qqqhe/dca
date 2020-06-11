@@ -23,6 +23,7 @@ Since DRAP-NC belongs to the class of convex mixed-integer nonlinear programming
 	- long[] lbNested: the lower bounds in nested constraints;
 	- long[] ubNested: the upper bounds in nested constraint;
 	- double[] cost_param_a and double[] cost_param_b: two parameters that define the convex objective function.
+	
 Due to the file sizes, we uploaded intances with up to 409,600 variables. 
 	
 2. DRAP-NC instances in the AMPL file format. Interested readers could use source code `./src/main/java/dca_ijoc/AMPLInstanceGenerator.java` to generate DRAP-NC test instances in the AMPL file format. A set of test instances with three sets of convex objectives in AMPL file format are provided in the folder `./ampl_instances/`. In the first line of each .dat file, we provide the optimal objective value given by DCA. 
