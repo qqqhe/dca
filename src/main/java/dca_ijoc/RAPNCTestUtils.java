@@ -384,4 +384,74 @@ public class RAPNCTestUtils {
             + String.format("%20s", (num_subpro_MDA)) 
         );
     }
+
+    /**
+     * compare_DCA_MDA_SFA method 
+     * This is a method that compares the efficiency of DCA, MDA, and SFA
+     * @param RAPNCInstanceData RAPNCInstanceData
+     */
+    public static String compare_DCA_MDA_SFA(RAPNCInstanceData data) {
+        /********************************************************************************
+        **
+        ** DCA: solve the problem by DCA and record the time
+        **
+        ********************************************************************************/
+        RAPNC test_instance = data.toRAPNC();
+        long startTime = System.currentTimeMillis();
+        ResultTypeRAPNC res = test_instance.solveIntegerDCA();
+
+        long endTime = System.currentTimeMillis();
+        long timeDCA = endTime - startTime;
+        
+        // Number of subproblems solved by DCA
+		// long num_subprob_DCA = test_instance.number_subproblem;
+        
+        /********************************************************************************
+        **
+        **MDA: solve the problem by FastMDA and record the time
+        **
+        ********************************************************************************/
+        RAPNC test_instance_MDA = data.toRAPNC();
+        startTime = System.currentTimeMillis();
+        ResultTypeMDA resFastMDA = test_instance_MDA.FastMDA();
+		endTime = System.currentTimeMillis();
+        long timeFastMDA = endTime - startTime;
+
+        // Number of subproblems solved by MDA
+        // long num_subpro_MDA = test_instance_MDA.number_subproblem;
+
+        /********************************************************************************
+        **
+        ** DCA: solve the problem by DCA and record the time
+        **
+        ********************************************************************************/
+        RAPNC test_instance_SFA = data.toRAPNC();
+        startTime = System.currentTimeMillis();
+        ResultTypeRAPNC res_sfa = test_instance_SFA.solveIntegerSFA();
+
+        endTime = System.currentTimeMillis();
+        long timeSFA = endTime - startTime;
+        
+        
+        // Sainity check
+        for (int i = 0; i < test_instance.dimension; i++) {
+			if (Math.abs(res.sol[i] - resFastMDA.aa[i]) >= 0.01) {
+				System.out.println("The solution x[" + i + "] is different.");
+				System.out.println(res.sol[i] + " " + " " + resFastMDA.aa[i]);
+			}
+            
+            if (Math.abs(res.sol[i] - res_sfa.sol[i]) >= 0.01) {
+				System.out.println("The solution x[" + i + "] is different.");
+				System.out.println(res.sol[i] + " " + " " + res_sfa.sol[i]);
+			}
+		}
+
+        // Return test 
+        return (
+            String.format("%10s", test_instance.dimension) 
+            + String.format("%10s", ((double) timeDCA) / 1000) 
+            + String.format("%10s", ((double) timeFastMDA) / 1000) 
+            + String.format("%10s", ((double) timeSFA) / 1000) 
+        );
+    }
 }

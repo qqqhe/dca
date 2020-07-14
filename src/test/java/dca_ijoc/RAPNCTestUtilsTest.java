@@ -122,13 +122,14 @@ class RAPNCTestUtilsTest {
 
     @Test 
     void testCompare_DCA_MDA() {
-        int[] test_sizes = new int[]{10, 20, 100, 200, 800, 1600};
+        int[] test_sizes = new int[]{10, 20, 100, 200, 800, 1600, 51200};
         String[] ObjFuncTypes = new String[]{"linear", "quadratic", "f", "fuel", "crash"};
 
         for (String ObjFuncType : ObjFuncTypes) {
             for (int test_size : test_sizes) {
                 RAPNCTestUtils.RAPNCInstanceData data = RAPNCTestUtils.generateInstanceData(ObjFuncType, test_size, 100);
                 System.out.println(RAPNCTestUtils.compare_DCA_MDA(data));
+                System.out.println(RAPNCTestUtils.compare_DCA_MDA_SFA(data));
             }
         }
         

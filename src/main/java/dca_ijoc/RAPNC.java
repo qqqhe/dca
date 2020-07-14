@@ -10,13 +10,13 @@ package dca_ijoc;
  * This is a class for RAPNC with separable convex objectives
  * It provides three methods to solve the problem      
  * Method: 
- *     1. solveInteger()-----DCA: (the infeasibility-guided divide-and-conquer algorithm) 
+ *     1. solveIntegerDCA()-----DCA: (the infeasibility-guided divide-and-conquer algorithm) 
  *     This algorithm is inspired by the paper "Speed optimization over a path with heterogeneous arc costs" (He et al. 2017, TRR-part B).
  *     The algorithm solves a DRAP relaxation of DRAP-NC and fixes the nested constraint with maximum violation tight.
  *     Then the problem can be divided into two subproblems in the form of DRAP-NC and are solved recursively.
  *     Running time: Theta(n^2 log B)
  *     Benefit: easy implementation and no Lipschitz continuity is required
- *     solveIntegerLinear() ---- With the O(n) subroutine for solving DRAP, the algorithm can be sped up to Theta(n^2)
+ *     solveIntegerLinearDCA() ---- With the O(n) subroutine for solving DRAP, the algorithm can be sped up to Theta(n^2)
  *     @param RAP class must be compiled
  *
  *     2. FastMDA(int u, int v)------MDA: (the monotonic decomposition algorithm)
@@ -26,9 +26,9 @@ package dca_ijoc;
  *     the boundary cases. Hence, we improve it to and implement FastMDA() 
  *     Running time: O(n log n log B)
  *     LinearMDA() ---- With the O(n) subroutine for solving DRAP, the algorithm can be sped up to O(n log n)
- *     
  *     @param RAP class must be compiled
- *         
+ *     
+ *     3. solveIntegerSFA()
  */
 
 import java.util.*;
@@ -1281,5 +1281,50 @@ public class RAPNC {
         return res.sol;
     }
 
+    /**
+     * solveIntegerSFA() 
+     * This is the implementation of the Scaled Flow-improving Algorithm (SFA)
+     * Time-Complexity: O(n^2 log(B)) 
+     * 
+     * @return ResultTypeRAPNC containing the solution and feasibility
+     */
+    public ResultTypeRAPNC solveIntegerSFA() {
+        RAPNCFlowFormulation flowFormulation = this.toRAPNCFlowFormulation();
+        
+        ResultTypeRAPNC res = new ResultTypeRAPNC(true, null);
+        res.sol = flowFormulation.solve();
+
+        return res;
+    }
+
+    /**
+     * Creates a RAPNCFlowFormulation object and 
+     * We can then call the solve() method in RAPNCFlowFormulation object to solve the problem
+     * Time-Complexity: O(n log(n) log(B)) 
+     * 
+     * @return  equivalent RAPNCFlowFormulation object
+     */
+    public RAPNCFlowFormulation toRAPNCFlowFormulation() {
+        RAPNCFlowFormulation res = new RAPNCFlowFormulation();
+        res.obj = obj;
+        res.numPeriod = dimension;
+        res.demands = new long[dimension];
+        res.prodCap = Arrays.copyOfRange(ubVar, 0, dimension);
+        res.inventCap = new long[dimension - 1];
+
+        res.demands[0] = lbNested[0];
+        for (int i = 1; i < dimension; i++) {
+            if (lbNested[i] < lbNested[i - 1]) {
+                lbNested[i] = lbNested[i - 1];
+            }
+            res.demands[i] = lbNested[i] - lbNested[i - 1]; 
+        }
+
+        for (int i = 0; i < dimension - 1; i++) {
+            res.inventCap[i] = ubNested[i] - lbNested[i];
+        }
+
+        return res;
+    }
 }   
 
