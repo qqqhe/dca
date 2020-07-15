@@ -422,7 +422,7 @@ public class RAPNCTestUtils {
 
         /********************************************************************************
         **
-        ** DCA: solve the problem by DCA and record the time
+        ** DCA: solve the problem by SFA and record the time
         **
         ********************************************************************************/
         RAPNC test_instance_SFA = data.toRAPNC();
