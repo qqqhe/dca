@@ -56,14 +56,15 @@ public class RAPNCFlowFormulation {
     }
 
     private class PathDataComparator implements Comparator<PathData> {
-        //compare the cost
+        // Compare the cost
         public int compare(PathData a, PathData b) {    		
             if (a.id == b.id) {
                 return 0;
-            }    		
-            if (a.value > b.value) {
-                return -1;
-            }
+            }    
+            /* Break ties by maximum index rule */		
+            if (a.value > b.value || (a.value == b.value && a.id < b.id)) {
+    			return -1;
+    		}
             return 1;
         }
     }
