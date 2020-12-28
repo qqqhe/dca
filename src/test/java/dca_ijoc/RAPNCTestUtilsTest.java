@@ -133,4 +133,34 @@ class RAPNCTestUtilsTest {
         }
         
     }
+
+    @Test
+    void testQuadraticContinuousRAP() {
+        int[] test_sizes = new int[]{10, 20, 100, 200, 800, 1600};
+        test_sizes = new int[]{10};
+
+        for (int test_size : test_sizes) {
+            for (int i = 1; i < 10; i++) {
+                RAPNCTestUtils.RAPNCInstanceData data = RAPNCTestUtils.generateInstanceData("quadratic", test_size, 100);
+                RAPNC instance_RAPNC = data.toRAPNC();
+                QuadraticContinuousRAP instance_continuous_RAP = new QuadraticContinuousRAP(
+                    instance_RAPNC.obj, 
+                    instance_RAPNC.lbNested[test_size - 1], 
+                    new long[test_size], 
+                    instance_RAPNC.ubVar
+                );
+
+                ResultTypeContinuousRAP res_bisection = instance_continuous_RAP.solve_QuaRAP_bisection();
+                ResultTypeContinuousRAP res_bucker84 = instance_continuous_RAP.solve_QuaRAP_bucker84();
+
+                // Sainity check
+                for (int j = 0; j < instance_continuous_RAP.dimension; j++) {
+                    if (Math.abs(res_bisection.sol[j] - res_bucker84.sol[j]) >= 0.01) {
+                        System.out.println("The solution x[" + j + "] is different.");
+                        System.out.println(res_bisection.sol[j] + " " + " " + res_bucker84.sol[j]);
+                    }   
+                } 
+            }
+        }
+    }
 }
